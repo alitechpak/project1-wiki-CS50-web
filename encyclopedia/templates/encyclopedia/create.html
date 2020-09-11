@@ -6,11 +6,19 @@
 
 {% block body %}
 
+    {% if error_message %}
+        {{ error_message }}
+        <div>
+            <a href="{% url 'wiki:create' %}">Try with another title</a>
+        </div>
+    {% else %}
     <h1>Create New Page</h1>
 
-    <form action="{% url 'wiki:create' %}" method="POST">
-        <input type="submit" value="Save" class="btn btn-success">
-        {% csrf_token %}
-        {{ form }}
-    </form>
+        <form action="{% url 'wiki:create' %}" method="POST">
+            <input type="submit" value="Save" class="btn btn-success">
+            {% csrf_token %}
+            {{ form }}
+        </form>
+    {% endif %}
+
 {% endblock %}

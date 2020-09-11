@@ -8,4 +8,7 @@
     <div>
         {{ content | safe }}
     </div>
+
+    <a href="{% url 'wiki:editPage' title %}">Edit this page</a>
+
 {% endblock %}

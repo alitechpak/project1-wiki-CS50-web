@@ -2,7 +2,9 @@ from django.shortcuts import render, redirect
 
 from . import util
 import markdown2
-from .forms import NewPageForm
+from .forms import NewPageForm, EditPageForm
+import random
+
 
 def index(request):
     return render(request, "encyclopedia/index.html", {
@@ -11,7 +13,6 @@ def index(request):
 
 def topic(request, md_entry):
     entry = util.get_entry(md_entry)
-    #   If entry doesn't exist
     if not entry:
         return render(request, "encyclopedia/error.html", {
             "error_message": "Sorry! your requested page was not found."
@@ -58,7 +59,7 @@ def create(request):
             content = form.cleaned_data["NewPage"]
 
             if util.get_entry(title):
-                return render(request, "encyclopedia/error.html", {
+                return render(request, "encyclopedia/create.html", {
                     "error_message": "Sorry! This title already exist"
                 })
             util.save_entry(title, content)
@@ -68,3 +69,27 @@ def create(request):
     return render(request, "encyclopedia/create.html", {
         "form": NewPageForm()
     })
+
+def edit(request, md_entry):
+
+    if request.method == "GET":
+
+        form = EditPageForm(initial={"editTitle": md_entry, "editPage": util.get_entry(md_entry)})
+
+        return render(request, "encyclopedia/edit.html", {
+            "form": form,
+            "title": md_entry,
+        })
+    else:
+        form = EditPageForm(request.POST)
+        if form.is_valid():
+            title = form.cleaned_data["editTitle"]
+            content = form.cleaned_data["editPage"]
+
+            util.save_entry(title, content)
+            
+            return topic(request, title)
+
+
+def randomPage(request):
+    return topic(request, random.choice(util.list_entries()))
